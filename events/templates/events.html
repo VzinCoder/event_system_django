@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Listar eventos {% endblock %}
+
+{% block content %}
+<h1 class='mt-4'> Eventos </h1>
+
+<!-- Botão para criar novo evento -->
+<div class="mb-3 mt-3">
+    <a href="{% url 'create_event' %}" class="btn btn-success btn-lg">
+        <i class="fas fa-plus-circle"></i> Criar Novo Evento
+    </a>
+</div>
+
+<!-- tabela para exibir os eventos -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+        Todos os eventos
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Local</th>
+                    <th>Data</th>
+                    <th>Limite de Participantes</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Nome</th>
+                    <th>Local</th>
+                    <th>Data</th>
+                    <th>Limite de Participantes</th>
+                    <th>Ações</th>
+                </tr>
+            </tfoot>
+            <tbody>
+               {% for event in events %}
+                    <tr>
+                        <td>{{ event.name }}</td>
+                        <td>{{ event.location }}</td>
+                        <td>{{ event.date | date:"d/m/Y H:i" }}</td>
+                        <td>{{ event.max_participants }}</td>
+                        <td>
+                            <!-- Botão Visualizar -->
+                            <a href="{% url 'details_event' event.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Visualizar
+                            </a>
+                            <!-- Botão Editar -->
+                            <a href="{% url 'edit_event' event.id %}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <!-- Botão Deletar -->
+                            <a href="{% url 'delete_event' event.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este evento?')">
+                                <i class="fas fa-trash-alt"></i> Deletar
+                            </a>
+                        </td>
+                    </tr>
+               {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'js/datatables-simple-demo.js' %}"></script>           
+{% endblock %}

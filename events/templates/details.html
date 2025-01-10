@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Evento{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="display-3">Detalhes</h1>
+        
+        <!-- Tabela de detalhes do evento -->
+        <table class="table table-bordered table-striped mt-4">
+            <tbody>
+                <tr>
+                    <th scope="row">Nome do Evento</th>
+                    <td>{{ event.name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Descrição</th>
+                    <td>{{ event.description }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Local</th>
+                    <td>{{ event.location }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Data</th>
+                    <td>{{ event.date | date:"d/m/Y H:i" }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Máximo de Participantes</th>
+                    <td>{{ event.max_participants }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Botões -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-lg">Editar Evento</a>
+            <a href="{% url 'list_events' %}" class="btn btn-secondary btn-lg">Voltar para a lista de eventos</a>
+        </div>
+    </div>
+{% endblock %}
