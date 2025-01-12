@@ -1,0 +1,98 @@
+{% extends "base-auth.html" %}
+{% block 'description' %}Página de Cadastro{% endblock %}
+{% block 'title' %}Criar conta{% endblock %}
+{% block 'content' %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header">
+                    <h3 class="text-center font-weight-light my-4">Criar Conta</h3>
+                </div>
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'register' %}">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3 mb-md-0">
+                                    {{ form.first_name }}
+                                    <label for="id_first_name">Primeiro Nome</label>
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small">
+                                            {{ form.first_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form.last_name }}
+                                    <label for="id_last_name">Sobrenome</label>
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small">
+                                            {{ form.last_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            {{ form.email }}
+                            <label for="id_email">Endereço de E-mail</label>
+                            {% if form.email.errors %}
+                                <div class="text-danger small">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3 mb-md-0">
+                                    {{ form.password1 }}
+                                    <label for="id_password1">Senha</label>
+                                    {% if form.password1.errors %}
+                                        <div class="text-danger small">
+                                            {{ form.password1.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3 mb-md-0">
+                                    {{ form.password2 }}
+                                    <label for="id_password2">Confirme a Senha</label>
+                                    {% if form.password2.errors %}
+                                        <div class="text-danger small">
+                                            {{ form.password2.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 mb-0">
+                            <div class="d-grid">
+                                <button class="btn btn-primary btn-block" type="submit">Criar Conta</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <div class="small"><a href="{% url 'login' %}">Já possui uma conta? Faça login</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from .forms import EventForm
 from .models import Event
+from django.contrib import messages
 
 def create_event(request):
     templateData  =  {
@@ -47,10 +48,15 @@ def details_event(request,id):
     event = get_object_or_404(Event, id=id)
     return render(request,'details.html',{'event':event})
 
-def delete_event(request,id):
-    evento = get_object_or_404(Event, id=id)
-    evento.delete()
-    return redirect('list_events')
+
+def delete_event(request, id):
+    if request.method == 'POST':
+        event = get_object_or_404(Event, id=id)
+        event.delete()
+        messages.success(request, f'Evento com o nome  "{event.name}" excluído com sucesso!')
+        return redirect('list_events')
+    else:
+        return redirect('list_events')
 
 def list_events(request):
     events = Event.objects.all()
