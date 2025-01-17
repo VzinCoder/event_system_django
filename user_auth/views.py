@@ -16,7 +16,7 @@ def custom_login(request):
               if user is None:
                       return render(request, 'login.html', {'form': form})
               login(request, user)
-              return redirect('list_events')  
+              return redirect('events')  
        return render(request, 'login.html', {'form': form})
 
 def register(request):

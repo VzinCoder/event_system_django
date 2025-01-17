@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Meus eventos {% endblock %}
+{% block title %} Meus Eventos {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
-<h1 class='mt-4'>Meus Eventos </h1>
+<h1 class="mt-4">Meus Eventos</h1>
 
 {% if messages %}
     <div class="alert alert-success" role="alert">
@@ -21,7 +21,7 @@
     </a>
 </div>
 
-<!-- tabela para exibir os eventos -->
+<!-- Tabela para exibir os eventos -->
 <div class="card mt-4">
     <div class="card-header">
         <i class="fas fa-table me-1"></i>
@@ -33,8 +33,8 @@
                 <tr>
                     <th>Nome</th>
                     <th>Local</th>
-                    <th>Data</th>
-                    <th>Limite de Participantes</th>
+                    <th>Data do Evento</th>
+                    <th>Visibilidade</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -42,18 +42,18 @@
                 <tr>
                     <th>Nome</th>
                     <th>Local</th>
-                    <th>Data</th>
-                    <th>Limite de Participantes</th>
+                    <th>Data do Evento</th>
+                    <th>Visibilidade</th>
                     <th>Ações</th>
                 </tr>
             </tfoot>
             <tbody>
-               {% for event in events %}
+                {% for event in events %}
                     <tr>
-                        <td>{{ event.name }}</td>
-                        <td>{{ event.location }}</td>
-                        <td>{{ event.date | date:"d/m/Y H:i" }}</td>
-                        <td>{{ event.max_participants }}</td>
+                        <td>{{ event.name |truncatewords:5 }}</td>
+                        <td>{{ event.location |truncatewords:5  }}</td>
+                        <td>{{ event.event_start_date | date:"d/m/Y H:i" }}</td>
+                        <td>{{ event.get_visibility_display }}</td>
                         <td>
                             <!-- Botão Visualizar -->
                             <a href="{% url 'details_event' event.id %}" class="btn btn-primary btn-sm">
@@ -64,19 +64,42 @@
                                 <i class="fas fa-edit"></i> Editar
                             </a>
                             <!-- Botão Deletar -->
-                            <form method="post" action="{% url 'delete_event' event.id %}" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este evento?')">
-                                    <i class="fas fa-trash-alt"></i> Deletar
-                                </button>
-                            </form>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.id }}">
+                                <i class="fas fa-trash-alt"></i> Deletar
+                            </button>
+
+                            <!-- Modal de Confirmação -->
+                            <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Você tem certeza que deseja excluir o evento "<strong>{{ event.name }}</strong>"?</p>
+                                            <p><strong>Local:</strong> {{ event.location }}</p>
+                                            <p><strong>Data do Evento:</strong> {{ event.event_start_date | date:"d/m/Y H:i" }}</p>
+                                            <p><strong>Visibilidade:</strong> {{ event.get_visibility_display }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form method="post" action="{% url 'delete_event' event.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
-               {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
 {% else %}
    {% include "verify-login.html" %}
 {% endif %}
@@ -85,5 +108,6 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-<script src="{% static 'js/datatables-simple-demo.js' %}"></script>           
+<script src="{% static 'js/datatables-simple-demo.js' %}"></script>
+<!-- Bootstrap JS (necessário para o modal funcionar) -->
 {% endblock %}

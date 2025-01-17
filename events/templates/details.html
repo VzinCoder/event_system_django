@@ -4,38 +4,68 @@
 
 {% block content %}
     <div class="container mt-5">
-        <h1 class="display-3">Detalhes</h1>
-        
-        <!-- Tabela de detalhes do evento -->
-        <table class="table table-bordered table-striped mt-4">
-            <tbody>
-                <tr>
-                    <th scope="row">Nome do Evento</th>
-                    <td>{{ event.name }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Descrição</th>
-                    <td>{{ event.description }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Local</th>
-                    <td>{{ event.location }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Data</th>
-                    <td>{{ event.date | date:"d/m/Y H:i" }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Máximo de Participantes</th>
-                    <td>{{ event.max_participants }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <h1 class="mb-4" >{{ event.name }}</h2>
+        <div class="row mt-4">
+            {%if event.image %}
+                <div class="col-md-4">
+                    <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid rounded" style="max-width: 100%;">
+                </div>
+             {% endif %}
+            <div class="col-md-8">
+                <dl class="definition-list">
+                    <div class="list-item">
+                        <dt>Descrição</dt>
+                        <dd class="border-bottom pb-2">{{ event.description }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Local</dt>
+                        <dd class="border-bottom pb-2">{{ event.location }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Data de Início</dt>
+                        <dd class="border-bottom pb-2">{{ event.event_start_date | date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Data de Término</dt>
+                        <dd class="border-bottom pb-2">{{ event.event_end_date | date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Início das Inscrições</dt>
+                        <dd class="border-bottom pb-2">{{ event.registration_start_date | date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Término das Inscrições</dt>
+                        <dd class="border-bottom pb-2">{{ event.registration_end_date | date:"d/m/Y H:i" }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Máximo de Participantes</dt>
+                        <dd class="border-bottom pb-2">{{ event.max_participants }}</dd>
+                    </div>
+                    <div class="list-item">
+                        <dt>Total de Participantes</dt>
+                        <dd class="border-bottom pb-2">{{ event.current_participants }}</dd>
+                    </div>
+                    {% if user.is_authenticated and event.user == user %}
+                    <div class="list-item">
+                        <dt>Visibilidade</dt>
+                        <dd class="border-bottom pb-2">{{ event.get_visibility_display }}</dd>
+                    </div>
+                    {%endif%}
+                    <div class="list-item">
+                        <dt>Link</dt>
+                        <a href="{{ event_url_absolute }}">
+                            {{ event_url_absolute }}
+                        </a>
+                    </div>
+                </dl>
+            </div>
+        </div>
 
-        <!-- Botões -->
+        {% if user.is_authenticated and event.user == user %}
         <div class="d-flex justify-content-between mt-4">
             <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-lg">Editar Evento</a>
             <a href="{% url 'my_events' %}" class="btn btn-secondary btn-lg">Voltar para a lista de eventos</a>
         </div>
+        {%endif%}
     </div>
 {% endblock %}

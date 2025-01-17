@@ -1,23 +1,41 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.core.validators import MinValueValidator
 from django.contrib.auth import get_user_model
 
 class Event(models.Model):
+    VISIBILITY_CHOICES = [
+        (True, 'Público'),
+        (False, 'Privado'),
+    ]
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     description = models.TextField()
     location = models.CharField(max_length=200)
-    date = models.DateTimeField()
-    max_participants = models.IntegerField(validators=[MinValueValidator(1)])
+    event_start_date = models.DateTimeField()
+    event_end_date = models.DateTimeField()
+    registration_start_date = models.DateTimeField()
+    registration_end_date = models.DateTimeField()
+    image = models.ImageField(upload_to='images',null=True,blank=True)  
+    current_participants = models.PositiveIntegerField(default=0)
+    max_participants = models.PositiveIntegerField(default=1)
+    visibility = models.BooleanField(choices=VISIBILITY_CHOICES, default=True)
 
-    def clean(self):
-        if timezone.is_naive(self.date):
-            self.date = timezone.make_aware(self.date)
-    
-        if self.date < timezone.now():
-            raise ValidationError("O evento não pode ser realizado no passado.")
+    def __str__(self):
+        visibility = "Público" if self.visibility else "Privado"
+        return (
+            f"Nome: {self.name}\n"
+            f"Descrição: {self.description}\n"
+            f"Localização: {self.location}\n"
+            f"Início do Evento: {self.event_start_date.strftime('%d/%m/%Y %H:%M')}\n"
+            f"Término do Evento: {self.event_end_date.strftime('%d/%m/%Y %H:%M')}\n"
+            f"Início das Inscrições: {self.registration_start_date.strftime('%d/%m/%Y %H:%M')}\n"
+            f"Término das Inscrições: {self.registration_end_date.strftime('%d/%m/%Y %H:%M')}\n"
+            f"Imagem: {self.image.url if self.image else 'Sem imagem'}\n"
+            f"Participantes Atuais: {self.current_participants}\n"
+            f"Máximo de Participantes: {self.max_participants}\n"
+            f"Visibilidade: {visibility}"
+        )
 
 """
 --Reseta as tabelas:
