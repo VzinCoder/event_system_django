@@ -11,8 +11,9 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
-    <body class="bg-primary">
+    <body class="bg-dark">
         <div id="layoutAuthentication">
+            {% include "header-apresentation.html" %} 
             <div id="layoutAuthentication_content">
                 <main>
                     {% block 'content' %}
@@ -21,17 +22,8 @@
                 </main>
             </div>
             <div id="layoutAuthentication_footer">
-                <footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted"> Copyright &copy; vzincoder 2025</div>
-                            <div>
-                                <a href="#">Privacy Policy</a>
-                                &middot;
-                                <a href="#">Terms &amp; Conditions</a>
-                            </div>
-                        </div>
-                    </div>
+                <footer class="bg-primary text-center py-3 mt-auto text-white">
+                    <p class="mb-0">&copy; 2025 vzincoder - Todos os direitos reservados.</p>
                 </footer>
             </div>
         </div>
