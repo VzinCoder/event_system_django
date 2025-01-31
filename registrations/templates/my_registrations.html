@@ -1,40 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}Eventos{% endblock %}
+{% block title %}Minhas Inscrições{% endblock %}
 {% load static %}
 
 {% block content %}
     <div class="container mt-4">
-        <h1 class="display-3">Eventos</h1>
+        <h1 class="display-3">Minhas Inscrições</h1>
         
-        <form class="d-md-none form-inline ms-auto me-0 me-md-3 my-2 my-md-0" action="{% url 'events' %}">
-            <div class="input-group">
-                <input  value='{{search}}' class="form-control" type="text" name="search" placeholder="Buscar por..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                <button type='submit' class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-            </div>
-        </form>
-        
-        {% if events %}
+        {% if registrations %}
             <div class="row">
-                {% for event in events %}
+                {% for registration in registrations %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <!-- Imagem do evento -->
-                            {% if event.image %}
-                                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
+                            {% if registration.event.image %}
+                                <img src="{{ registration.event.image.url }}" class="card-img-top" alt="{{ registration.event.name }}">
                             {% else %}
                                 <img src="{% static 'assets/img/sem-imagem.jpg' %}" class="card-img-top" alt="Imagem não disponível">
                             {% endif %}
 
                             <div class="card-body">
-                                <h5 class="card-title">{{ event.name }}</h5>
+                                <h5 class="card-title">{{ registration.event.name }}</h5>
                                 <p class="card-text">
-                                    {{ event.description|truncatewords:20 }} <!-- Descrição curta -->
+                                    {{ registration.event.description|truncatewords:20 }} <!-- Descrição curta -->
                                 </p>
                             </div>
 
                             <div class="card-footer text-center">
-                                <a href="{% url 'details_event' event.id %}" class="btn btn-primary">Ver Detalhes</a>
+                                <a href="{% url 'details_event' registration.event.id %}" class="btn btn-primary">Ver Detalhes</a>
                             </div>
                         </div>
                     </div>
@@ -44,7 +37,7 @@
             <nav aria-label="Navegação de página">
                 <ul class="pagination justify-content-center">
                     <!-- Primeira página -->
-                    {% if events.has_previous %}
+                    {% if registrations.has_previous %}
                         <li class="page-item">
                             <a class="page-link" href="?page=1" aria-label="Primeira">
                                 <span aria-hidden="true">&laquo;&laquo;</span>
@@ -52,7 +45,7 @@
                         </li>
                         <!-- Página anterior -->
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ events.previous_page_number }}" aria-label="Anterior">
+                            <a class="page-link" href="?page={{ registrations.previous_page_number }}" aria-label="Anterior">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
@@ -70,12 +63,12 @@
                     {% endif %}
 
                     <!-- Números das páginas -->
-                    {% for num in events.paginator.page_range %}
-                        {% if events.number == num %}
+                    {% for num in registrations.paginator.page_range %}
+                        {% if registrations.number == num %}
                             <li class="page-item active">
                                 <a class="page-link">{{ num }}</a>
                             </li>
-                        {% elif num >= events.number|add:'-2' and num <= events.number|add:'2' %}
+                        {% elif num >= registrations.number|add:'-2' and num <= registrations.number|add:'2' %}
                             <li class="page-item">
                                 <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                             </li>
@@ -83,15 +76,15 @@
                     {% endfor %}
 
                     <!-- Próxima página -->
-                    {% if events.has_next %}
+                    {% if registrations.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ events.next_page_number }}" aria-label="Próxima">
+                            <a class="page-link" href="?page={{ registrations.next_page_number }}" aria-label="Próxima">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
                         <!-- Última página -->
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ events.paginator.num_pages }}" aria-label="Última">
+                            <a class="page-link" href="?page={{ registrations.paginator.num_pages }}" aria-label="Última">
                                 <span aria-hidden="true">&raquo;&raquo;</span>
                             </a>
                         </li>
@@ -110,15 +103,9 @@
                 </ul>
             </nav>
         {% else %}
-            
             <div class="alert alert-warning text-center" role="alert">
-                {% if search %}
-                    Nenhum Evento Encontrado para "{{search}}"
-                {% else %}
-                    Nenhum Evento Encontrado
-                {% endif %}
+                Nenhuma inscrição encontrada.
             </div>
-           
         {% endif %}
     </div>
 {% endblock %}

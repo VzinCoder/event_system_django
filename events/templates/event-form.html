@@ -38,9 +38,12 @@
             </div>
         {% endfor %}
 
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">{{ button_text }}</button>
-            <a href="{% url 'my_events' %}" class="btn btn-secondary">Voltar para a lista de eventos</a>
+        <div class="d-flex justify-content-between gap-3 mb-3">
+            <button type="submit" class="btn btn-primary d-none d-md-inline-block">{{ button_text }}</button>
+            <button type="submit" class="btn btn-primary btn-sm d-md-none">{{ button_text }}</button>
+            <!-- Botão de voltar para a lista de eventos -->
+            <a href="{% url 'my_events' %}" class="btn btn-secondary  d-none d-md-inline-block">Voltar para a lista de eventos</a>
+             <a href="{% url 'my_events' %}" class="btn btn-secondary btn-sm d-md-none">Voltar para a lista de eventos</a>
         </div>
     </form>
 

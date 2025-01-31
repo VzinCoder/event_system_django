@@ -14,6 +14,7 @@
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+
             <!-- Navbar Brand-->
             <a class="navbar-brand ps-3" href="{% url 'events' %}">EventFlow</a>
             <!-- Sidebar Toggle-->
@@ -21,7 +22,7 @@
             <!-- Navbar Search-->
             <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0" action="{% url 'events' %}">
                 <div class="input-group">
-                    <input  value='{{search}}' class="form-control" type="text" name="search" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                    <input  value='{{search}}' class="form-control" type="text" name="search" placeholder="Buscar por..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
                     <button type='submit' class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
                 </div>
             </form>
@@ -41,6 +42,7 @@
                 </li>
             </ul>
         </nav>
+
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -53,6 +55,10 @@
                             <a class="nav-link" href="{%  url 'my_events' %}">
                                 <div class="sb-nav-link-icon"><i class="fa fa-user-check"></i></div>
                                 Meus Eventos
+                            </a>
+                            <a class="nav-link" href="{% url 'my_registrations' %}">
+                                <div class="sb-nav-link-icon"><i class="fa fa-list"></i></div>
+                                Minhas Inscrições
                             </a>
                         </div>
                     </div>

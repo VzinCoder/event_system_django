@@ -5,12 +5,13 @@ from django.utils import timezone
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'description','image','location', 'event_start_date','event_end_date','max_participants','registration_start_date','registration_end_date','visibility']
+        fields = ['name', 'description', 'image', 'location', 'event_start_date', 'event_end_date', 
+                  'max_participants', 'registration_start_date', 'registration_end_date', 'visibility']
 
         labels = {
             'name': 'Nome',
             'description': 'Descrição',
-            'image':"Imagem do Evento",
+            'image': "Imagem do Evento",
             'location': 'Localização',
             'event_start_date': 'Data de Início do Evento',
             'event_end_date': 'Data de Término do Evento',
@@ -33,35 +34,33 @@ class EventForm(forms.ModelForm):
                 attrs={'class': 'form-select'}, 
                 choices=[(True, 'Público'), (False, 'Privado')]
             ),
-            'image': forms.FileInput(attrs={'class': 'form-control','required':False})
+            'image': forms.FileInput(attrs={'class': 'form-control', 'required': False})
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        event_start_date = cleaned_data.get('event_start_date')
+        event_end_date = cleaned_data.get('event_end_date')
+        registration_start_date = cleaned_data.get('registration_start_date')
+        registration_end_date = cleaned_data.get('registration_end_date')
 
-    def clean_registration_start_date(self):
-        reg_start_date = self.cleaned_data.get('registration_start_date')
-        if reg_start_date and reg_start_date < timezone.now():
-            raise forms.ValidationError("A data de início das inscrições não pode estar no passado.")
-        return reg_start_date
+        # Validação da data de início das inscrições
+        if registration_start_date and registration_start_date < timezone.now():
+            self.add_error('registration_start_date', "A data de início das inscrições não pode estar no passado.")
 
-    def clean_registration_end_date(self):
-        reg_end_date = self.cleaned_data.get('registration_end_date')
-        reg_start_date = self.cleaned_data.get('registration_start_date')
-        if reg_end_date and reg_start_date and reg_end_date < reg_start_date:
-            raise forms.ValidationError("A data de término das inscrições deve ser posterior à data de início das inscrições.")
-        return reg_end_date
+        # Validação da data de término das inscrições
+        if registration_end_date and registration_start_date and registration_end_date < registration_start_date:
+            self.add_error('registration_end_date', "A data de término das inscrições deve ser posterior à data de início das inscrições.")
 
-    def clean_event_start_date(self):
-        event_start_date = self.cleaned_data.get('event_start_date')
-        reg_end_date = self.cleaned_data.get('registration_end_date')
+        # Validação da data de início do evento
         if event_start_date and event_start_date < timezone.now():
-            raise forms.ValidationError("A data de início do evento não pode estar no passado.")
-        if event_start_date and reg_end_date and event_start_date < reg_end_date:
-            raise forms.ValidationError("A data de início do evento deve ser posterior à data de término das inscrições.")
-        return event_start_date
+            self.add_error('event_start_date', "A data de início do evento não pode estar no passado.")
 
-    def clean_event_end_date(self):
-        event_end_date = self.cleaned_data.get('event_end_date')
-        event_start_date = self.cleaned_data.get('event_start_date')
+        if event_start_date and registration_end_date and event_start_date < registration_end_date:
+            self.add_error('event_start_date', "A data de início do evento deve ser posterior à data de término das inscrições.")
+
+        # Validação da data de término do evento
         if event_end_date and event_start_date and event_end_date < event_start_date:
-            raise forms.ValidationError("A data de término do evento deve ser posterior à data de início do evento.")
-        return event_end_date
+            self.add_error('event_end_date', "A data de término do evento deve ser posterior à data de início do evento.")
+
+        return cleaned_data

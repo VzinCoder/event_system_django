@@ -1,16 +1,28 @@
 {% extends 'base.html' %}
 
+
+
 {% block title %}Detalhes do Evento{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 class="mb-4" >{{ event.name }}</h2>
+    <div class="container mt-5 mb-5">
+        {% if messages %}
+    {% for message in messages %}
+        {% if forloop.first %}  {# Verifica se é a primeira iteração #}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} text-center">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+        <h1 class="mb-4">{{ event.name }}</h1>
         <div class="row mt-4">
-            {%if event.image %}
+            {% if event.image %}
                 <div class="col-md-4">
-                    <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid rounded" style="max-width: 100%;">
+                    <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid rounded shadow" style="max-width: 100%;">
                 </div>
-             {% endif %}
+            {% endif %}
             <div class="col-md-8">
                 <dl class="definition-list">
                     <div class="list-item">
@@ -50,7 +62,7 @@
                         <dt>Visibilidade</dt>
                         <dd class="border-bottom pb-2">{{ event.get_visibility_display }}</dd>
                     </div>
-                    {%endif%}
+                    {% endif %}
                     <div class="list-item">
                         <dt>Link</dt>
                         <a href="{{ event_url_absolute }}">
@@ -62,10 +74,26 @@
         </div>
 
         {% if user.is_authenticated and event.user == user %}
-        <div class="d-flex justify-content-between mt-4">
-            <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-lg">Editar Evento</a>
-            <a href="{% url 'my_events' %}" class="btn btn-secondary btn-lg">Voltar para a lista de eventos</a>
+        <div class="d-flex justify-content-between mt-4 gap-3 mb-3">
+            <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-sm d-md-none">Editar Evento</a>
+            <a href="{% url 'my_events' %}" class="btn btn-secondary btn-sm d-md-none">Voltar para a lista de eventos</a>
+
+            <!-- Botões maiores em telas grandes -->
+            <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-lg d-none d-md-inline-block">Editar Evento</a>
+            <a href="{% url 'my_events' %}" class="btn btn-secondary btn-lg d-none d-md-inline-block">Voltar para a lista de eventos</a> 
         </div>
-        {%endif%}
+        {% else %}
+        <div class="position-relative mt-4 d-flex justify-content-center">
+            <form method="post" action="{% url 'register_in_event' event.id %}">
+                {% csrf_token %}
+                <button type="submit"  {% if disable_btn %} disabled{% endif %} 
+                    class="btn btn-success btn-lg px-5 py-3 fw-bold text-white shadow-lg rounded-pill 
+                           d-inline-flex align-items-center gap-2"
+                    style="transition: all 0.3s ease-in-out; border: none;">
+                    <i class="fas fa-calendar-check"></i> Inscrever-se
+                </button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 {% endblock %}

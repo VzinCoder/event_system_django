@@ -25,6 +25,7 @@ urlpatterns = [
     path('',home_page,name='home'),
     path('events/', include('events.urls')),  
     path('auth/', include('user_auth.urls')),  
+    path('register/event/',include('registrations.urls'))
 ]
 
 

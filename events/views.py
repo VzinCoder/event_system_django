@@ -5,6 +5,8 @@ from .models import Event
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from registrations.models import Registration
+from django.utils.timezone import now
 
 
 @login_required
@@ -50,12 +52,39 @@ def edit_event(request,id):
     return render(request, 'event-form.html',templateData)
 
 
-def details_event(request,id):
+
+def details_event(request, id):
     event = get_object_or_404(Event, id=id)
     event_url = reverse('details_event', args=[event.id])
     event_url_absolute = request.build_absolute_uri(event_url)
-    print(event_url_absolute)
-    return render(request,'details.html',{'event':event, 'event_url_absolute': event_url_absolute})
+
+    user_is_registered = False
+    registrations_closed = False
+    event_full = False
+
+    if request.user.is_authenticated:
+        user_is_registered = Registration.objects.filter(user=request.user, event=event).exists()
+
+    registrations_closed = not (event.registration_start_date <= now() <= event.registration_end_date)
+    event_full = event.current_participants >= event.max_participants
+
+    if user_is_registered:
+        messages.warning(request, "Você já está inscrito neste evento!")
+    elif registrations_closed:
+        messages.warning(request, "As inscrições para este evento não estão abertas no momento.")
+    elif event_full:
+        messages.warning(request, "O limite de participantes para este evento foi atingido.")
+
+    disable_btn = registrations_closed or event_full or user_is_registered
+    return render(
+        request, 
+        'details.html', 
+        {
+            'event': event, 
+            'event_url_absolute': event_url_absolute,
+            'disable_btn': disable_btn,
+        }
+    )
 
 @login_required
 def delete_event(request, id):
