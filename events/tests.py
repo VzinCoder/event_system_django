@@ -185,6 +185,13 @@ class EventViewsTest(TestCase):
             visibility=True
         )
 
+    def test_create_event_user_not_authenticated(self):
+        self.client.logout()
+        url = reverse('create_event')
+        response = self.client.get(url)
+        self.assertRedirects(response, f'{reverse("login")}?next={url}')
+        
+
     def test_create_event_get(self):
         response = self.client.get(reverse('create_event'))
         self.assertEqual(response.status_code, 200)
@@ -227,12 +234,18 @@ class EventViewsTest(TestCase):
         # deve ser 1 pois o setUp inicia um evento
         self.assertEqual(Event.objects.count(), 1)
 
+    def test_edit_event_user_not_authenticated(self):
+        self.client.logout()
+        url = reverse('edit_event',args=[self.event.id])
+        response = self.client.get(url)
+        self.assertRedirects(response, f'{reverse("login")}?next={url}')
+        
     def test_edit_event_get(self):
         response = self.client.get(reverse('edit_event', args=[self.event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response,template_name="event-form.html")
         self.assertIn('form', response.context)
-        
+
     def test_edit_event_post(self):
         data = {
             'name': 'Updated Event',
@@ -314,6 +327,12 @@ class EventViewsTest(TestCase):
         self.assertTemplateUsed(response=response,template_name="details.html")
         self.assertIn('event', response.context)
         self.assertContains(response,"O limite de participantes para este evento foi atingido.")
+
+    def test_delete_event_user_not_authenticated(self):
+        self.client.logout()
+        url = reverse('delete_event',args=[self.event.id])
+        response = self.client.post(url)
+        self.assertRedirects(response, f'{reverse("login")}?next={url}')
 
     def test_delete_event_get(self):
         response = self.client.get(reverse('delete_event', args=[self.event.id]))
@@ -404,6 +423,12 @@ class EventViewsTest(TestCase):
         # a ultima pagina que é a 2 deve retornar 3 eventos
         self.assertEqual(len(events_response), 3)
     
+    def test_get_profile_user_not_authenticated(self):
+        self.client.logout()
+        url = reverse('profile')
+        response = self.client.post(url)
+        self.assertRedirects(response, f'{reverse("login")}?next={url}')
+
     def test_get_profile(self):
         response = self.client.get(reverse('profile'))
         self.assertEqual(response.status_code,200)
