@@ -1,4 +1,4 @@
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from .forms import CustomAuthenticationForm,CustomUserCreationForm
@@ -28,9 +28,9 @@ class CustomAuthenticationFormTest(TestCase):
 class CustomUserCreationFormTest(TestCase):
     def test_valid_form(self):
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'first_name_test',
+            'last_name': 'last_name_test',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
@@ -39,9 +39,9 @@ class CustomUserCreationFormTest(TestCase):
 
     def test_password_mismatch(self):
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'first_name_test',
+            'last_name': 'last_name_test',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'differentpassword'
         }
@@ -50,11 +50,11 @@ class CustomUserCreationFormTest(TestCase):
         self.assertIn('password2', form.errors)
 
     def test_existing_email(self):
-        User.objects.create_user(username='existinguser', email='john.doe@example.com', password='12345')
+        User.objects.create_user(username='existinguser', email='test@example.com', password='12345')
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'first_name_test',
+            'last_name': 'last_name_test',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
@@ -63,11 +63,11 @@ class CustomUserCreationFormTest(TestCase):
         self.assertIn('email', form.errors)
 
     def test_existing_username(self):
-        User.objects.create_user(username='John', email='john.doe@example.com', password='12345')
+        User.objects.create_user(username='first_name_test', email='test@example.com', password='12345')
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe2@example.com',
+            'first_name': 'first_name_test',
+            'last_name': 'last_name_test',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
@@ -77,17 +77,17 @@ class CustomUserCreationFormTest(TestCase):
 
     def test_save_method(self):
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'first_name_test',
+            'last_name': 'last_name_test',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
         form = CustomUserCreationForm(data=form_data)
         self.assertTrue(form.is_valid())
         user = form.save()
-        self.assertEqual(user.username, 'John')
-        self.assertEqual(user.email, 'john.doe@example.com')
+        self.assertEqual(user.username, 'first_name_test')
+        self.assertEqual(user.email, 'test@example.com')
 
 class CustomLoginViewTest(TestCase):
     def setUp(self):
@@ -96,6 +96,8 @@ class CustomLoginViewTest(TestCase):
     def test_get_request(self):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'login.html')
+        self.assertIn('form',response.context)
         self.assertIsInstance(response.context['form'], CustomAuthenticationForm)
 
     def test_post_request_valid_credentials(self):
@@ -112,6 +114,7 @@ class CustomLoginViewTest(TestCase):
             'password': 'wrongpassword'
         })
         self.assertEqual(response.status_code, 200)  # Permanece na página de login
+        self.assertTemplateUsed(response,'login.html')
         self.assertIn('form', response.context)
         self.assertTrue(response.context['form'].errors)
 
@@ -121,6 +124,7 @@ class CustomLoginViewTest(TestCase):
             'password': ''
         })
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'login.html')
         self.assertIn('form', response.context)
         self.assertTrue(response.context['form'].errors)
 
@@ -128,20 +132,21 @@ class RegisterViewTest(TestCase):
     def test_get_request(self):
         response = self.client.get(reverse('register'))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'register.html')
         self.assertIsInstance(response.context['form'], CustomUserCreationForm)
 
     def test_post_request_valid_data(self):
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'test_first_name',
+            'last_name': 'test_last_name',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
         response = self.client.post(reverse('register'), data=form_data)
         self.assertEqual(response.status_code, 302)  # Redirecionamento para 'login'
         self.assertRedirects(response, reverse('login'))
-        self.assertTrue(User.objects.filter(email='john.doe@example.com').exists())
+        self.assertTrue(User.objects.filter(email='test@example.com').exists())
 
     def test_post_request_invalid_data(self):
         form_data = {
@@ -153,20 +158,22 @@ class RegisterViewTest(TestCase):
         }
         response = self.client.post(reverse('register'), data=form_data)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'register.html')
         self.assertIn('form', response.context)
         self.assertTrue(response.context['form'].errors)
 
     def test_post_request_existing_email(self):
-        User.objects.create_user(username='existinguser', email='john.doe@example.com', password='12345')
+        User.objects.create_user(username='existinguser', email='test@example.com', password='12345')
         form_data = {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'john.doe@example.com',
+            'first_name': 'test_first_name',
+            'last_name': 'test_last_name',
+            'email': 'test@example.com',
             'password1': 'complexpassword123',
             'password2': 'complexpassword123'
         }
         response = self.client.post(reverse('register'), data=form_data)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'register.html')
         self.assertIn('form', response.context)
         self.assertTrue(response.context['form'].errors)
 
@@ -183,4 +190,4 @@ class CustomLogoutViewTest(TestCase):
     def test_logout_unauthenticated_user(self):
         response = self.client.get(reverse('logout'))
         self.assertEqual(response.status_code, 302)  # Redirecionamento para 'login'
-        self.assertTrue(response.url.startswith(reverse('login')))  # Verifica se a URL começa com 
+        self.assertTrue(response.url.startswith(reverse('login')))  # Verifica se a URL começa com a url do login

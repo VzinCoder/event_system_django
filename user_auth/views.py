@@ -5,8 +5,8 @@ from django.contrib.auth import authenticate, login,logout
 
 def custom_login(request):
        if request.method == 'GET':
-        form = CustomAuthenticationForm()
-        return render(request, 'login.html', {'form': form})
+            form = CustomAuthenticationForm()
+            return render(request, 'login.html', {'form': form})
     
        form = CustomAuthenticationForm(request, data=request.POST)
        if form.is_valid():
