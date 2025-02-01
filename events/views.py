@@ -92,9 +92,7 @@ def delete_event(request, id):
         event = get_object_or_404(Event, id=id,user=request.user)
         event.delete()
         messages.success(request, f'Evento com o nome  "{event.name}" excluído com sucesso!')
-        return redirect('my_events')
-    else:
-        return redirect('my_events')
+    return redirect('my_events')
 
 def list_events_user(request):
     if not request.user.is_authenticated:
@@ -119,8 +117,6 @@ def list_events(request):
         'events': events_paginate,
         'search': search_query 
     })
-
-
 
 @login_required
 def get_profile(request):
