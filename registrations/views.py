@@ -38,12 +38,11 @@ def register(request, id):
 def my_registrations(request):
     if not request.user.is_authenticated:
         return render(request, 'my_registrations.html')
+    
     registrations = Registration.objects.filter(user=request.user)
     registrations = registrations.order_by('-registration_date')
-    # Configurar a paginação
-    paginator = Paginator(registrations, 6)  # 6 inscrições por página
-    page_number = request.GET.get('page')  # Obtém o número da página via GET
-    page_obj = paginator.get_page(page_number)  # Obtém a página atual
-
-    # Passar o objeto de paginação para o template
+    
+    paginator = Paginator(registrations, 6)  
+    page_number = request.GET.get('page')  
+    page_obj = paginator.get_page(page_number)
     return render(request, 'my_registrations.html', {'registrations': page_obj})
