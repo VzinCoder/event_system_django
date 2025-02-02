@@ -4,6 +4,7 @@
 {% load static %}
 
 {% block content %}
+{% if user.is_authenticated %}
     <div class="container mt-4">
         <h1 class="display-3">Minhas Inscrições</h1>
         
@@ -108,4 +109,8 @@
             </div>
         {% endif %}
     </div>
+    {% else %}
+    {% include "verify-login.html" %}
+ {% endif %}
 {% endblock %}
+

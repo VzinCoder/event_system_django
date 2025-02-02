@@ -20,7 +20,8 @@ def register(request, id):
 
     try:
         with transaction.atomic():
-            event = Event.objects.select_for_update().get(id=id)  
+            event = Event.objects.select_for_update().get(id=id)
+            # event = Event.objects.filter(id = id).first()
             if event.current_participants >= event.max_participants:
                 return redirect("details_event", id=id)
 
@@ -36,9 +37,9 @@ def register(request, id):
 
 
 
-@login_required
 def my_registrations(request):
-    # Buscar as inscrições do usuário logado
+    if not request.user.is_authenticated:
+        return render(request, 'my_registrations.html')
     registrations = Registration.objects.filter(user=request.user)
 
     # Configurar a paginação
