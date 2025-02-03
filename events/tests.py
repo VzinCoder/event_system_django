@@ -5,7 +5,7 @@ from .forms import EventForm
 from django.urls import reverse
 from django.contrib.auth.models import User
 from registrations.models import Registration
-
+from zoneinfo import ZoneInfo
 class EventModelTest(TestCase):
 
     def setUp(self):
@@ -48,6 +48,8 @@ class EventFormTest(TestCase):
 
     def setUp(self):
         self.current_time = timezone.now()
+        self.valid_timezone = "America/Sao_Paulo"
+        self.invalid_timezone = "Invalid/Timezone"
 
     def test_valid_form(self):
         form_data = {
@@ -60,6 +62,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=2),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -76,6 +79,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=2),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -93,6 +97,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time - timezone.timedelta(hours=1),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -110,6 +115,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=2),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -127,6 +133,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=2),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -144,6 +151,7 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=3),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -161,16 +169,99 @@ class EventFormTest(TestCase):
             'registration_end_date': self.current_time + timezone.timedelta(hours=2),
             'max_participants': 100,
             'visibility': True,
+            'timezone':self.valid_timezone
         }
         form = EventForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('event_end_date', form.errors)
-      
+    # testes para o metodo convert_data
+    def test_convert_data_to_utc_valid_timezone(self):
+        form = EventForm(data={'timezone': self.valid_timezone})
+        converted_date = form.convert_data_to_utc(self.current_time)
+        expected_date = self.current_time.replace(tzinfo=ZoneInfo(self.valid_timezone)).astimezone(ZoneInfo("UTC"))
+        self.assertEqual(converted_date, expected_date)
+
+    def test_convert_data_to_utc_no_timezone(self):
+        form = EventForm(data={})  # Sem timezone
+        converted_date = form.convert_data_to_utc(self.current_time)
+        self.assertEqual(converted_date, self.current_time)
+
+    def test_convert_data_to_utc_none_date(self):
+        form = EventForm(data={'timezone': self.valid_timezone})
+        converted_date = form.convert_data_to_utc(None)
+
+        self.assertIsNone(converted_date)
+
+    def test_convert_data_to_utc_invalid_timezone(self):
+        form = EventForm(data={'timezone': self.invalid_timezone})
+        converted_date = form.convert_data_to_utc(self.current_time)
+        self.assertEqual(converted_date, self.current_time)
+        self.assertIn('timezone', form.errors)
+    
+    # teste usando o form ao inves de usar o metodo diretamnte
+    def test_integration_convert_data_to_utc_valid_timezone(self):
+        form_data = {
+            'name': 'Evento Teste',
+            'description': 'Descrição do evento',
+            'location': 'Local do evento',
+            'event_start_date': self.current_time + timezone.timedelta(days=1),
+            'event_end_date': self.current_time + timezone.timedelta(days=2),
+            'registration_start_date': self.current_time + timezone.timedelta(hours=1),
+            'registration_end_date': self.current_time + timezone.timedelta(hours=2),
+            'max_participants': 100,
+            'visibility': True,
+            'timezone':self.valid_timezone
+        }
+        form = EventForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        cleaned_data = form.clean()  # Chama o método `clean` para processar os dados
+        # dados do form validado
+        event_start_date = cleaned_data.get('event_start_date')
+        event_end_date = cleaned_data.get('event_end_date')
+        registration_start_date =cleaned_data.get('registration_start_date')
+        registration_end_date = cleaned_data.get('registration_end_date')
+
+        def convert_date(date):
+            return date.replace(tzinfo=ZoneInfo(self.valid_timezone)).astimezone(ZoneInfo("UTC"))
+
+        # Verifica se os campos de data foram convertidos corretamente para UTC
+        self.assertEqual(event_start_date,convert_date(form_data['event_start_date']))
+        self.assertEqual(event_end_date,convert_date(form_data['event_end_date']))
+        self.assertEqual(registration_start_date,convert_date(form_data['registration_start_date']))
+        self.assertEqual(registration_end_date,convert_date(form_data['registration_end_date']))
+        
+    def test_integration_convert_data_to_utc_invalid_timezone(self):
+        form_data = {
+            'name': 'Evento Teste',
+            'description': 'Descrição do evento',
+            'location': 'Local do evento',
+            'event_start_date': self.current_time + timezone.timedelta(days=1),
+            'event_end_date': self.current_time + timezone.timedelta(days=2),
+            'registration_start_date': self.current_time + timezone.timedelta(hours=1),
+            'registration_end_date': self.current_time + timezone.timedelta(hours=2),
+            'max_participants': 100,
+            'visibility': True,
+            'timezone':self.invalid_timezone
+        }
+        form = EventForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        cleaned_data = form.clean()  # Chama o método `clean` para processar os dados
+        # dados do form validado
+        event_start_date = cleaned_data.get('event_start_date')
+        event_end_date = cleaned_data.get('event_end_date')
+        registration_start_date =cleaned_data.get('registration_start_date')
+        registration_end_date = cleaned_data.get('registration_end_date')
+        self.assertEqual(event_start_date,form_data['event_start_date'])
+        self.assertEqual(event_end_date,form_data['event_end_date'])
+        self.assertEqual(registration_start_date,form_data['registration_start_date'])
+        self.assertEqual(registration_end_date,form_data['registration_end_date'])
+               
 class EventViewsTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
         self.client.login(username='testuser', password='12345')
-
+        self.valid_timezone = "America/Sao_Paulo"
+        self.invalid_timezone = "Invalid/Timezone"
         # evento valido
         self.event = Event.objects.create(
             user=self.user,
@@ -208,7 +299,8 @@ class EventViewsTest(TestCase):
             'registration_start_date': timezone.now() + timezone.timedelta(hours=1),
             'registration_end_date': timezone.now() + timezone.timedelta(hours=2),
             'max_participants': 10,
-            'visibility': True
+            'visibility': True,
+            'timezone':self.valid_timezone
         }
         response = self.client.post(reverse('create_event'), data)
         self.assertEqual(response.status_code, 302)
@@ -225,7 +317,8 @@ class EventViewsTest(TestCase):
             'registration_start_date': timezone.now() + timezone.timedelta(hours=1),
             'registration_end_date': timezone.now() + timezone.timedelta(hours=2),
             'max_participants': 10,
-            'visibility': True
+            'visibility': True,
+            'timezone':self.valid_timezone
         }
         response = self.client.post(reverse('create_event'), data)
         self.assertEqual(response.status_code, 200)
@@ -256,18 +349,20 @@ class EventViewsTest(TestCase):
             'registration_start_date': timezone.now() + timezone.timedelta(hours=1),
             'registration_end_date': timezone.now() + timezone.timedelta(hours=2),
             'max_participants': 20,
-            'visibility': False
+            'visibility': False,
+            'timezone':self.valid_timezone
         }
         response = self.client.post(reverse('edit_event', args=[self.event.id]), data)
         self.assertEqual(response.status_code, 302)
         self.event.refresh_from_db()
+        form = EventForm(data={'timezone':self.valid_timezone})
         self.assertEqual(self.event.name, data.get('name'))
         self.assertEqual(self.event.description, data.get('description'))
         self.assertEqual(self.event.location, data.get('location'))
-        self.assertEqual(self.event.event_start_date,data.get('event_start_date'))
-        self.assertEqual(self.event.event_end_date,data.get('event_end_date'))
-        self.assertEqual(self.event.registration_start_date,data.get('registration_start_date'))
-        self.assertEqual(self.event.registration_end_date,data.get('registration_end_date'))
+        self.assertEqual(self.event.event_start_date,form.convert_data_to_utc(data.get('event_start_date')))
+        self.assertEqual(self.event.event_end_date,form.convert_data_to_utc(data.get('event_end_date')))
+        self.assertEqual(self.event.registration_start_date,form.convert_data_to_utc(data.get('registration_start_date')))
+        self.assertEqual(self.event.registration_end_date,form.convert_data_to_utc(data.get('registration_end_date')))
         self.assertEqual(self.event.max_participants,data.get('max_participants'))
         self.assertEqual(self.event.visibility,data.get('visibility'))
     
@@ -282,7 +377,8 @@ class EventViewsTest(TestCase):
             'registration_start_date': timezone.now() + timezone.timedelta(hours=1),
             'registration_end_date': timezone.now() + timezone.timedelta(hours=2),
             'max_participants': 20,
-            'visibility': False
+            'visibility': False,
+            'timezone':self.valid_timezone
         }
         response = self.client.post(reverse('edit_event', args=[self.event.id]), data)
         self.assertEqual(response.status_code, 200)
