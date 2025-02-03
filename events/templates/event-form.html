@@ -19,6 +19,7 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
+            {%if field.name != 'timezone'%}
             <div class="mb-3">
                 {{ field.label_tag }}
                 
@@ -36,6 +37,8 @@
                     </div>
                 {% endif %}
             </div>
+            {%endif%}
+            
         {% endfor %}
 
         <div class="d-flex justify-content-between gap-3 mb-3">
@@ -45,6 +48,17 @@
             <a href="{% url 'my_events' %}" class="btn btn-secondary  d-none d-md-inline-block">Voltar para a lista de eventos</a>
              <a href="{% url 'my_events' %}" class="btn btn-secondary btn-sm d-md-none">Voltar para a lista de eventos</a>
         </div>
-    </form>
 
+        {{form.timezone}}
+    </form>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var timezoneField = document.querySelector('input[name="timezone"]');
+        timezoneField.value = userTimezone;
+    });
+</script>
+{%endblock%}
