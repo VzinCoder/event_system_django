@@ -37,6 +37,20 @@ class EventForm(forms.ModelForm):
             ),
             'image': forms.FileInput(attrs={'class': 'form-control', 'required': False})
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Campos de data e hora que precisam ser formatados
+        datetime_fields = [
+            'event_start_date', 'event_end_date',
+            'registration_start_date', 'registration_end_date'
+        ]
+
+        # Formata os valores iniciais para o formato ISO
+        for field in datetime_fields:
+            if self.initial.get(field):
+                self.initial[field] = self.initial[field].strftime('%Y-%m-%dT%H:%M')
 
     def convert_data_to_utc(self, dt):
         if not dt:
@@ -77,7 +91,7 @@ class EventForm(forms.ModelForm):
         event_end_date = cleaned_data.get('event_end_date')
         registration_start_date = cleaned_data.get('registration_start_date')
         registration_end_date = cleaned_data.get('registration_end_date')
-        
+        #print(registration_start_date)
         # Validação da data de início das inscrições
         if registration_start_date and registration_start_date < timezone.now():
             self.add_error('registration_start_date', "A data de início das inscrições não pode estar no passado.")
