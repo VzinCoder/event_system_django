@@ -28,14 +28,22 @@
         </div>
         <div class="mb-3">
             <label class="form-label fw-bold">Último Login:</label>
-            <p class="form-control-plaintext">
-                {% if user.last_login %}
-                    {{ user.last_login|date:"d/m/Y H:i:s" }}
-                {% else %}
+            <p class="form-control-plaintext" data-date='{{user.last_login.isoformat}}'>
                     Nunca acessou
-                {% endif %}
             </p>
         </div>
     </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+    const dateElements = document.querySelectorAll('[data-date]')
+
+    {% if user.last_login %}
+        dateElements.forEach(element => {
+            element.textContent =  formatDate(new Date(element.dataset.date))
+         })
+    {% endif %}
+    
+</script>
+{%endblock%}
