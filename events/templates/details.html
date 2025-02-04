@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 
-
 {% block title %}Detalhes do Evento{% endblock %}
 
 {% block content %}
@@ -35,19 +34,19 @@
                     </div>
                     <div class="list-item">
                         <dt>Data de Início</dt>
-                        <dd class="border-bottom pb-2">{{ event.event_start_date | date:"d/m/Y H:i" }}</dd>
+                        <dd class="border-bottom pb-2" data-date="{{event.event_start_date.isoformat}}">Date...</dd>
                     </div>
                     <div class="list-item">
                         <dt>Data de Término</dt>
-                        <dd class="border-bottom pb-2">{{ event.event_end_date | date:"d/m/Y H:i" }}</dd>
+                        <dd class="border-bottom pb-2" data-date="{{event.event_end_date.isoformat}}">Date...</dd>
                     </div>
                     <div class="list-item">
                         <dt>Início das Inscrições</dt>
-                        <dd class="border-bottom pb-2">{{ event.registration_start_date | date:"d/m/Y H:i" }}</dd>
+                        <dd class="border-bottom pb-2" data-date="{{event.registration_start_date.isoformat}}">Date...</dd>
                     </div>
                     <div class="list-item">
                         <dt>Término das Inscrições</dt>
-                        <dd class="border-bottom pb-2">{{ event.registration_end_date | date:"d/m/Y H:i" }}</dd>
+                        <dd class="border-bottom pb-2" data-date="{{event.registration_end_date.isoformat}}">Date...</dd>
                     </div>
                     <div class="list-item">
                         <dt>Máximo de Participantes</dt>
@@ -97,3 +96,13 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    const dateElements = document.querySelectorAll('[data-date]')
+
+    dateElements.forEach(element => {
+       element.textContent =  formatDate(new Date(element.dataset.date))
+    })
+</script>
+{%endblock%}

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block title %} {{ title }} {% endblock %}
 
 {% block content %}
@@ -24,7 +23,7 @@
                 {{ field.label_tag }}
                 
                 {% if field.name == 'event_start_date' or field.name == 'event_end_date' or field.name == 'registration_start_date' or field.name == 'registration_end_date' %}
-                    <input type="datetime-local" name="{{ field.name }}" value="{{ field.value|date:'Y-m-d\TH:i' }}" class="form-control">
+                    <input type="datetime-local" name="{{ field.name }}"  value="{{ field.value}}"  class="form-control">
                 {% else %}
                     {{ field }}
                 {% endif %}
@@ -59,6 +58,13 @@
         var userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         var timezoneField = document.querySelector('input[name="timezone"]');
         timezoneField.value = userTimezone;
-    });
+        {% if title != 'Criar Evento' and not isDateConverted %}
+            const inputsDateTimeElements = document.querySelectorAll('input[type="datetime-local"]')
+                inputsDateTimeElements.forEach((input) => {
+                convertDateToUserTimezone
+                input.value = convertDateToUserTimezone(input.value)
+            })
+        {% endif %}
+    })
 </script>
 {%endblock%}

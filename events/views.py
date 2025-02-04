@@ -41,6 +41,7 @@ def edit_event(request,id):
 
     if request.method == 'GET':
         templateData['form'] = EventForm(instance=event)
+        templateData['isDateConverted'] = False
         return render(request, 'event-form.html', templateData)
     
     form = EventForm(request.POST,request.FILES, instance=event)
@@ -49,6 +50,7 @@ def edit_event(request,id):
        return redirect('details_event',id=event.id)
     
     templateData['form'] = form
+    templateData['isDateConverted'] = True
     return render(request, 'event-form.html',templateData)
 
 

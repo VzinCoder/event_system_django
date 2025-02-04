@@ -24,3 +24,23 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+const convertDateToUserTimezone = (dateForm) => {
+    const date = new Date(`${dateForm}Z`);
+    const offsetMinutos = date.getTimezoneOffset();
+    return new Date(date.getTime() - offsetMinutos * 60 * 1000).toISOString().slice(0, 16);
+}
+
+const formatDate = (date) => {
+    const options = { 
+        year: 'numeric',
+        month: '2-digit', 
+        day: '2-digit', 
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false, 
+    };
+
+    const formattedDate = new Intl.DateTimeFormat(undefined, options).format(date);
+    return formattedDate;
+}

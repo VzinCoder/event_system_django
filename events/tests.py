@@ -338,6 +338,8 @@ class EventViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response=response,template_name="event-form.html")
         self.assertIn('form', response.context)
+        self.assertIn('isDateConverted',response.context)
+        self.assertFalse(response.context.get('isDateConverted'))
 
     def test_edit_event_post(self):
         data = {
@@ -386,6 +388,8 @@ class EventViewsTest(TestCase):
         self.assertIn('form', response.context)
         self.event.refresh_from_db()
         self.assertNotEqual(self.event.name,data.get('name'))
+        self.assertIn('isDateConverted',response.context)
+        self.assertTrue(response.context.get('isDateConverted'))
 
     def test_details_event_registrations_open(self):
         self.event.registration_start_date = timezone.now() - timezone.timedelta(hours=1)
