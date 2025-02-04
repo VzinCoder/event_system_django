@@ -61,7 +61,6 @@
         {% if title != 'Criar Evento' and not isDateConverted %}
             const inputsDateTimeElements = document.querySelectorAll('input[type="datetime-local"]')
                 inputsDateTimeElements.forEach((input) => {
-                convertDateToUserTimezone
                 input.value = convertDateToUserTimezone(input.value)
             })
         {% endif %}
